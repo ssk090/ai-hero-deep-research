@@ -24,31 +24,28 @@ export async function POST(request: Request) {
 
   const body = (await request.json()) as {
     messages: Array<Message>;
-    chatId?: string;
+    chatId: string;
+    isNewChat: boolean;
   };
 
-  const { messages, chatId } = body;
+  const { messages, chatId, isNewChat } = body;
 
   if (!messages.length) {
     return new Response("No messages provided", { status: 400 });
   }
 
-  // If no chatId is provided, create a new chat with the user's message
-  let currentChatId = chatId;
-  if (!currentChatId) {
-    const newChatId = crypto.randomUUID();
-
+  // If this is a new chat, create it with the user's message
+  if (isNewChat) {
     await upsertChat({
       userId: session.user.id,
-      chatId: newChatId,
+      chatId,
       title: messages[messages.length - 1]!.content.slice(0, 50) + "...",
       messages: messages, // Save the user's message initially
     });
-    currentChatId = newChatId;
   } else {
     // Verify the chat belongs to the user
     const chat = await db.query.chats.findFirst({
-      where: eq(chats.id, currentChatId),
+      where: eq(chats.id, chatId),
     });
     if (!chat || chat.userId !== session.user.id) {
       return new Response("Chat not found or unauthorized", { status: 404 });
@@ -58,10 +55,10 @@ export async function POST(request: Request) {
   return createDataStreamResponse({
     execute: async (dataStream) => {
       // If this is a new chat, send the chat ID to the frontend
-      if (!chatId) {
+      if (isNewChat) {
         dataStream.writeData({
           type: "NEW_CHAT_CREATED",
-          chatId: currentChatId,
+          chatId,
         });
       }
 
@@ -113,7 +110,7 @@ Remember to use the searchWeb tool whenever you need to find current information
           // Save the complete chat history with all messages
           await upsertChat({
             userId: session.user.id,
-            chatId: currentChatId,
+            chatId,
             title: messages[messages.length - 1]!.content.slice(0, 50) + "...",
             messages: updatedMessages,
           });
