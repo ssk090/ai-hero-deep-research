@@ -37,11 +37,12 @@ export async function POST(request: Request) {
   let currentChatId = chatId;
   if (!currentChatId) {
     const newChatId = crypto.randomUUID();
+
     await upsertChat({
       userId: session.user.id,
       chatId: newChatId,
       title: messages[messages.length - 1]!.content.slice(0, 50) + "...",
-      messages: messages, // Only save the user's message initially
+      messages: messages, // Save the user's message initially
     });
     currentChatId = newChatId;
   } else {
@@ -109,11 +110,11 @@ Remember to use the searchWeb tool whenever you need to find current information
             return;
           }
 
-          // Save the complete chat history
+          // Save the complete chat history with all messages
           await upsertChat({
             userId: session.user.id,
             chatId: currentChatId,
-            title: lastMessage.content.slice(0, 50) + "...",
+            title: messages[messages.length - 1]!.content.slice(0, 50) + "...",
             messages: updatedMessages,
           });
         },

@@ -23,6 +23,11 @@ export const upsertChat = async (opts: {
     }
     // Delete all existing messages
     await db.delete(messages).where(eq(messages.chatId, chatId));
+    // Update the chat's updatedAt timestamp
+    await db
+      .update(chats)
+      .set({ updatedAt: new Date() })
+      .where(eq(chats.id, chatId));
   } else {
     // Create new chat
     await db.insert(chats).values({
@@ -67,7 +72,7 @@ export const getChat = async (opts: { userId: string; chatId: string }) => {
     messages: chat.messages.map((message) => ({
       id: message.id,
       role: message.role,
-      content: message.parts,
+      parts: message.parts,
     })),
   };
 };
