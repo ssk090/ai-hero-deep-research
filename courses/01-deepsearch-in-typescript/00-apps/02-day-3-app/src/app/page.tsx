@@ -33,7 +33,7 @@ export default async function HomePage({
     activeChat?.messages.map((msg) => ({
       id: msg.id,
       role: msg.role as "user" | "assistant",
-      parts: msg.content as Message["parts"],
+      parts: msg.parts as Message["parts"],
       content: "",
     })) ?? [];
 
