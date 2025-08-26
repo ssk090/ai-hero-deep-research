@@ -154,28 +154,20 @@ Remember to use the searchWeb tool whenever you need to find current information
               if (!result.success) {
                 return {
                   error: result.error,
-                  results: result.results,
-                  success: false,
+                  results: result.results.map(({ url, result }) => ({
+                    url,
+                    success: result.success,
+                    data: result.success ? result.data : result.error,
+                  })),
                 };
               }
 
               return {
-                success: true,
-                results: result.results.map(({ url, result: crawlResult }) => {
-                  if (crawlResult.success) {
-                    return {
-                      url,
-                      content: crawlResult.data,
-                      success: true,
-                    };
-                  } else {
-                    return {
-                      url,
-                      content: `Error: ${crawlResult.error}`,
-                      success: false,
-                    };
-                  }
-                }),
+                results: result.results.map(({ url, result }) => ({
+                  url,
+                  success: result.success,
+                  data: result.data,
+                })),
               };
             },
           },

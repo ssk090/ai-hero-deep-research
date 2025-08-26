@@ -24,7 +24,7 @@ export interface BulkCrawlSuccessResponse {
   success: true;
   results: {
     url: string;
-    result: CrawlResponse;
+    result: CrawlSuccessResponse;
   }[];
 }
 
