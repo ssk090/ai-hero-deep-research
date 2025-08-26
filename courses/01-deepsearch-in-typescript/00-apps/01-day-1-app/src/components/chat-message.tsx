@@ -7,7 +7,6 @@ interface ChatMessageProps {
 }
 
 const components: Components = {
-  // Override default elements with custom styling
   p: ({ children }) => <p className="mb-4 first:mt-0 last:mb-0">{children}</p>,
   ul: ({ children }) => <ul className="mb-4 list-disc pl-4">{children}</ul>,
   ol: ({ children }) => <ol className="mb-4 list-decimal pl-4">{children}</ol>,

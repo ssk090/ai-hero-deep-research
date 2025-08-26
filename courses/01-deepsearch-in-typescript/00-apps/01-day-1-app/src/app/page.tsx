@@ -31,7 +31,7 @@ export default async function HomePage() {
                 className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 title="New Chat"
               >
-                <PlusIcon className="h-5 w-5" />
+                <PlusIcon className="size-5" />
               </Link>
             )}
           </div>
@@ -68,7 +68,27 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <ChatPage userName={userName} />
+      {/* Main Content */}
+      {isAuthenticated ? (
+        <ChatPage userName={userName} />
+      ) : (
+        <div className="flex flex-1 flex-col items-center justify-center p-8">
+          <div className="text-center">
+            <h1 className="mb-4 text-3xl font-bold text-white">
+              Welcome to AI Chat
+            </h1>
+            <p className="mb-8 text-lg text-gray-400">
+              Sign in with Discord to start chatting with AI
+            </p>
+            <div className="flex justify-center">
+              <AuthButton
+                isAuthenticated={isAuthenticated}
+                userImage={session?.user?.image}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
