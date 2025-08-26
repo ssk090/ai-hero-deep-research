@@ -64,7 +64,7 @@ export const ChatPage = ({
     <>
       <div className="flex flex-1 flex-col">
         <StickToBottom
-          className="mx-auto w-full max-w-[65ch] flex-1 overflow-auto [&>div]:scrollbar-thin [&>div]:scrollbar-track-gray-200 [&>div]:scrollbar-thumb-gray-600"
+          className="mx-auto w-full max-w-[120ch] flex-1 overflow-auto [&>div]:scrollbar-thin [&>div]:scrollbar-track-gray-200 [&>div]:scrollbar-thumb-gray-600"
           resize="smooth"
           initial="smooth"
           role="log"
@@ -89,7 +89,7 @@ export const ChatPage = ({
         </StickToBottom>
 
         <div className="border-t border-gray-700">
-          <form onSubmit={handleSubmit} className="mx-auto max-w-[65ch] p-4">
+          <form onSubmit={handleSubmit} className="mx-auto max-w-[120ch] p-4">
             <div className="flex gap-2">
               <input
                 value={input}
