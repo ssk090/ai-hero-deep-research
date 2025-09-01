@@ -8,6 +8,11 @@ import { chats } from "~/server/db/schema";
 import { Langfuse } from "langfuse";
 import { env } from "~/env";
 import { streamFromDeepSearch } from "~/deep-search";
+import {
+  checkRateLimit,
+  recordRateLimit,
+  type RateLimitConfig,
+} from "~/rate-limit";
 
 const langfuse = new Langfuse({
   environment: env.NODE_ENV,
@@ -15,12 +20,37 @@ const langfuse = new Langfuse({
 
 export const maxDuration = 60;
 
+// Global rate limiting configuration - applied to all requests
+const rateLimitConfig: RateLimitConfig = {
+  maxRequests: 1,
+  maxRetries: 3,
+  windowMs: 20_000,
+  keyPrefix: "chat",
+};
+
 export async function POST(request: Request) {
   const session = await auth();
 
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
   }
+
+  // Check the rate limit BEFORE any other processing
+  const rateLimitCheck = await checkRateLimit(rateLimitConfig);
+
+  if (!rateLimitCheck.allowed) {
+    console.log("Rate limit exceeded, waiting...");
+    const isAllowed = await rateLimitCheck.retry();
+    // If the rate limit is still exceeded after retries, return a 429
+    if (!isAllowed) {
+      return new Response("Rate limit exceeded", {
+        status: 429,
+      });
+    }
+  }
+
+  // Record the request
+  await recordRateLimit(rateLimitConfig);
 
   const body = (await request.json()) as {
     messages: Array<Message>;
