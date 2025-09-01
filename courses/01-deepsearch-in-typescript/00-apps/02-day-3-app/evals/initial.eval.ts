@@ -28,5 +28,16 @@ evalite("Deep Search Eval", {
   task: async (input) => {
     return askDeepSearch(input);
   },
-  scorers: [],
+  scorers: [
+    {
+      name: "Contains Links",
+      description: "Checks if the output contains any markdown links.",
+      scorer: ({ output }) => {
+        // Regular expression to match markdown links [text](url)
+        const markdownLinkRegex = /\[([^\]]+)\]\(([^)]+)\)/;
+        const containsLinks = markdownLinkRegex.test(output);
+        return containsLinks ? 1 : 0;
+      },
+    },
+  ],
 });
